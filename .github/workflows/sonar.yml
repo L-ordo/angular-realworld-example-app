@@ -33,8 +33,16 @@ jobs:
       - name: Build Angular project
         run: npm run build
 
-      - name: Run tests with coverage
-        run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+      - name: Check and run tests with coverage
+        shell: bash
+        run: |
+          if find src -type f -name '*.spec.ts' -print -quit | grep -q .; then
+            echo "Pruebas encontradas. Ejecutando..."
+            npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+          else
+            echo "::warning::No se encontraron pruebas unitarias (*.spec.ts)."
+            echo "Se continua sin reporte de cobertura."
+          fi
 
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarqube-scan-action@v8.5.0
